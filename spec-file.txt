@@ -1,0 +1,41 @@
+# This file may be used to create an environment using:
+# $ conda create --name <env> --file <this file>
+# platform: osx-64
+@EXPLICIT
+https://conda.anaconda.org/anaconda/osx-64/blas-1.0-mkl.tar.bz2
+https://repo.anaconda.com/pkgs/main/osx-64/ca-certificates-2020.7.22-0.conda
+https://conda.anaconda.org/anaconda/osx-64/intel-openmp-2020.1-216.tar.bz2
+https://conda.anaconda.org/anaconda/osx-64/jpeg-9b-he5867d9_2.tar.bz2
+https://repo.anaconda.com/pkgs/main/osx-64/libcxx-10.0.0-1.conda
+https://repo.anaconda.com/pkgs/main/osx-64/xz-5.2.5-h1de35cc_0.conda
+https://repo.anaconda.com/pkgs/main/osx-64/zlib-1.2.11-h1de35cc_3.conda
+https://repo.anaconda.com/pkgs/main/osx-64/libffi-3.3-hb1e8313_2.conda
+https://conda.anaconda.org/anaconda/osx-64/libpng-1.6.37-ha441bb4_0.tar.bz2
+https://conda.anaconda.org/anaconda/osx-64/lz4-c-1.9.2-hb1e8313_1.tar.bz2
+https://conda.anaconda.org/anaconda/osx-64/mkl-2019.4-233.tar.bz2
+https://repo.anaconda.com/pkgs/main/osx-64/ncurses-6.2-h0a44026_1.conda
+https://conda.anaconda.org/anaconda/osx-64/openssl-1.1.1g-h1de35cc_0.tar.bz2
+https://conda.anaconda.org/anaconda/osx-64/tk-8.6.10-hb0a8c7a_0.tar.bz2
+https://conda.anaconda.org/anaconda/osx-64/freetype-2.10.2-ha233b18_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/osx-64/libedit-3.1.20191231-h1de35cc_1.conda
+https://repo.anaconda.com/pkgs/main/osx-64/readline-8.0-h1de35cc_0.conda
+https://conda.anaconda.org/anaconda/osx-64/zstd-1.4.4-h1990bb4_3.tar.bz2
+https://conda.anaconda.org/anaconda/osx-64/libtiff-4.1.0-hcb84e12_1.tar.bz2
+https://repo.anaconda.com/pkgs/main/osx-64/sqlite-3.32.3-hffcf06c_0.conda
+https://conda.anaconda.org/anaconda/osx-64/lcms2-2.11-h92f6f08_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/osx-64/python-3.8.5-h26836e1_0.conda
+https://conda.anaconda.org/anaconda/osx-64/certifi-2020.6.20-py38_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/osx-64/ninja-1.10.1-py38h879752b_0.conda
+https://conda.anaconda.org/anaconda/noarch/olefile-0.46-py_0.tar.bz2
+https://conda.anaconda.org/anaconda/noarch/six-1.15.0-py_0.tar.bz2
+https://conda.anaconda.org/anaconda/osx-64/mkl-service-2.3.0-py38hfbe908c_0.tar.bz2
+https://conda.anaconda.org/anaconda/osx-64/pillow-7.2.0-py38ha54b6ba_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/osx-64/setuptools-49.6.0-py38_0.conda
+https://conda.anaconda.org/anaconda/osx-64/numpy-base-1.19.1-py38hcfb5961_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/osx-64/wheel-0.34.2-py38_0.conda
+https://repo.anaconda.com/pkgs/main/osx-64/pip-20.2.2-py38_0.conda
+https://conda.anaconda.org/anaconda/osx-64/mkl_fft-1.1.0-py38hc64f4ea_0.tar.bz2
+https://conda.anaconda.org/anaconda/osx-64/mkl_random-1.1.1-py38h959d312_0.tar.bz2
+https://conda.anaconda.org/anaconda/osx-64/numpy-1.19.1-py38h3b9f5b6_0.tar.bz2
+https://conda.anaconda.org/pytorch/osx-64/pytorch-1.6.0-py3.8_0.tar.bz2
+https://conda.anaconda.org/pytorch/osx-64/torchvision-0.7.0-py38_cpu.tar.bz2
