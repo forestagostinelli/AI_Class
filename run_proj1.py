@@ -22,8 +22,8 @@ def main():
 
     viz: InteractiveFarm = InteractiveFarm(env, grid)
 
-    for _ in range(100):
-        viz.window.update()
+    # for _ in range(100):
+    #    viz.window.update()
 
     if args.method == "breadth_first":
         breadth_first_search(env, viz, args.wait)
