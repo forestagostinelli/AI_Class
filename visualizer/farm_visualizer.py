@@ -264,10 +264,10 @@ class InteractiveFarm:
             self.grid_squares.append(grid_squares_row)
 
         # create figures
-        self._place_imgs(self.board, self.goal_pic, [self.goal_idx])
-        self._place_imgs(self.board, self.plant_pic, self.plant_idxs)
-        self._place_imgs(self.board, self.rocks_pic, self.rocks_idxs)
-        self.agent_img = self._place_imgs(self.board, self.robot_pic, [self.agent_idx])[0]
+        self.place_imgs(self.board, self.goal_pic, [self.goal_idx])
+        self.place_imgs(self.board, self.plant_pic, self.plant_idxs)
+        self.place_imgs(self.board, self.rocks_pic, self.rocks_idxs)
+        self.agent_img = self.place_imgs(self.board, self.robot_pic, [self.agent_idx])[0]
 
         # create grid arrows
         self.grid_arrows: List[List[List]] = []
@@ -285,7 +285,7 @@ class InteractiveFarm:
     def mainloop(self):
         self.window.mainloop()
 
-    def _place_imgs(self, board: Canvas, img, idxs: List[Tuple[int, int]]):
+    def place_imgs(self, board: Canvas, img, idxs: List[Tuple[int, int]]):
         created_imgs: List = []
         for idx in idxs:
             created_img = board.create_image(idx[0] * self.width + self.width_half + 4,
