@@ -3,7 +3,7 @@ from environments.connect_four import ConnectFourState, ConnectFour
 from visualizer.connect_four_visualizer import ConnectFourVisualizer
 import numpy as np
 
-from proj_code_answers.proj2 import minimax_search, heuistic
+from proj_code.proj2 import minimax_search, heuistic
 
 
 def main():
