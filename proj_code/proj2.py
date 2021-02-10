@@ -10,7 +10,7 @@ def heuistic(state: ConnectFourState) -> float:
     pass
 
 
-def minimax_search(state: ConnectFourState, env: ConnectFour, depth: int) -> int:
+def heuristic_minimax_search(state: ConnectFourState, env: ConnectFour, depth: int) -> int:
     """
     Returns the action to take
     :param state: connect four game state

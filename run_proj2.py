@@ -3,7 +3,7 @@ from environments.connect_four import ConnectFourState, ConnectFour
 from visualizer.connect_four_visualizer import ConnectFourVisualizer
 import numpy as np
 
-from proj_code.proj2 import minimax_search, heuistic
+from proj_code_answers.proj2 import heuristic_minimax_search, heuistic
 
 
 def main():
@@ -23,7 +23,7 @@ def main():
     elif args.opponent == "minimax":
         def opponent(state: ConnectFourState):
             print(heuistic(state))
-            return minimax_search(state, env, args.depth)
+            return heuristic_minimax_search(state, env, args.depth)
 
     else:
         raise ValueError("Unknown opponent type %s" % args.opponent)
