@@ -192,12 +192,13 @@ def _get_color(val: float, cell_score_min: float, cell_score_max: float):
 
 
 class InteractiveFarm:
-    def __init__(self, env: FarmGridWorld, grid: np.ndarray):
+    def __init__(self, env: FarmGridWorld, grid: np.ndarray, val_max: float = 0.0, val_min: float = -30):
         # 0: up, 1: down, 2: left, 3: right
 
         super().__init__()
         # initialize environment
-        self.val_max: float = 0
+        self.val_max: float = val_max
+        self.val_min: float = val_min
 
         self.env: FarmGridWorld = env
 
@@ -217,19 +218,6 @@ class InteractiveFarm:
             for pos_j in range(grid.shape[1]):
                 state: FarmState = FarmState((pos_i, pos_j), self.goal_idx, self.plant_idxs, self.rocks_idxs)
                 self.states.append(state)
-
-        # enumerate value funcs
-        self.state_vals: Dict[FarmState, float] = dict()
-        self.action_vals: Dict[FarmState, List[float]] = dict()
-        self.state_visits: Dict[FarmState, int] = dict()
-        for state in self.states:
-            self.state_visits[state] = 0
-            self.state_vals[state] = 0.0
-
-            if self.env.is_terminal(state):
-                self.action_vals[state] = [0] * self.num_actions
-            else:
-                self.action_vals[state] = [0] * self.num_actions
 
         # initialize board
         self.window = tkinter.Tk()
@@ -252,16 +240,27 @@ class InteractiveFarm:
 
         # create initial grid squares
         self.grid_squares: List[List] = []
+        self.grid_text: List[List] = []
         for pos_i in range(grid_dim_x):
             grid_squares_row: List = []
+            grid_text_rows: List = []
             for pos_j in range(grid_dim_y):
+                # grid square
                 square = self.board.create_rectangle(pos_i * self.width + 4,
                                                      pos_j * self.width + 4,
                                                      (pos_i + 1) * self.width + 4,
                                                      (pos_j + 1) * self.width + 4, fill="white", width=1)
 
                 grid_squares_row.append(square)
+
+                # grid text
+                text = self.board.create_text(pos_i * self.width + self.width_half,
+                                              pos_j * self.width + self.width_half,
+                                              text="", fill="black")
+                grid_text_rows.append(text)
+
             self.grid_squares.append(grid_squares_row)
+            self.grid_text.append(grid_text_rows)
 
         # create figures
         self.place_imgs(self.board, self.goal_pic, [self.goal_idx])
@@ -293,3 +292,102 @@ class InteractiveFarm:
             created_imgs.append(created_img)
 
         return created_imgs
+
+    def set_state_values(self, state_values: Dict[FarmState, float]):
+        for state in self.states:
+            pos_i, pos_j = state.agent_idx
+            val: float = state_values[state]
+
+            # color = _get_color(val, cell_score_min, cell_score_max)
+            color = hsl_interp((val - self.val_min) / (self.val_max - self.val_min))
+
+            self.board.itemconfigure(self.grid_squares[pos_i][pos_j], fill=color)
+            self.board.itemconfigure(self.grid_text[pos_i][pos_j], text=str(format(val, '.2f')), fill="black")
+
+    def set_action_values(self, action_values: Dict[FarmState, List[float]]):
+        grid_dim_x, grid_dim_y = self.env.grid_shape
+
+        for grid_arrows_row in self.grid_arrows:
+            for grid_arrow in grid_arrows_row:
+                self.board.delete(grid_arrow)
+
+        self.grid_arrows: List[List[List]] = []
+        for pos_i in range(grid_dim_x):
+            grid_arrows_row: List = []
+            for pos_j in range(grid_dim_y):
+                state: FarmState = FarmState((pos_i, pos_j), self.goal_idx, self.plant_idxs, self.rocks_idxs)
+                if self.env.is_terminal(state):
+                    continue
+
+                for action, action_value in enumerate(action_values[state]):
+                    color = _get_color(action_value, self.val_min, self.val_max)
+                    # color = hsl_interp((action_value - self.val_min) / (self.val_max - self.val_min))
+                    grid_arrow = self._create_arrow(action, pos_i, pos_j, color)
+                    grid_arrows_row.append(grid_arrow)
+
+            self.grid_arrows.append(grid_arrows_row)
+
+    def set_policy(self, policy: Dict[FarmState, List[float]]):
+        grid_dim_x, grid_dim_y = self.env.grid_shape
+
+        for grid_arrows_row in self.grid_arrows:
+            for grid_arrow in grid_arrows_row:
+                self.board.delete(grid_arrow)
+
+        self.grid_arrows: List[List[List]] = []
+        for pos_i in range(grid_dim_x):
+            grid_arrows_row: List = []
+            for pos_j in range(grid_dim_y):
+                state: FarmState = FarmState((pos_i, pos_j), self.goal_idx, self.plant_idxs, self.rocks_idxs)
+                if self.env.is_terminal(state):
+                    continue
+
+                for action, policy_prob in enumerate(policy[state]):
+                    if policy_prob == 0.0:
+                        continue
+                    color: str = "gray%i" % (100 - 100 * policy_prob)
+                    grid_arrow = self._create_arrow(action, pos_i, pos_j, color)
+                    grid_arrows_row.append(grid_arrow)
+
+            self.grid_arrows.append(grid_arrows_row)
+
+    def _create_arrow(self, action: int, pos_i: int, pos_j: int, color):
+        triangle_size: float = 0.2
+
+        if action == 0:
+            grid_arrow = self.board.create_polygon((pos_i + 0.5 - triangle_size) * self.width + 4,
+                                                   (pos_j + triangle_size) * self.width + 4,
+                                                   (pos_i + 0.5 + triangle_size) * self.width + 4,
+                                                   (pos_j + triangle_size) * self.width + 4,
+                                                   (pos_i + 0.5) * self.width + 4,
+                                                   pos_j * self.width + 4,
+                                                   fill=color, width=1)
+        elif action == 1:
+            grid_arrow = self.board.create_polygon((pos_i + 0.5 - triangle_size) * self.width + 4,
+                                                   (pos_j + 1 - triangle_size) * self.width + 4,
+                                                   (pos_i + 0.5 + triangle_size) * self.width + 4,
+                                                   (pos_j + 1 - triangle_size) * self.width + 4,
+                                                   (pos_i + 0.5) * self.width + 4,
+                                                   (pos_j + 1) * self.width + 4,
+                                                   fill=color, width=1)
+
+        elif action == 2:
+            grid_arrow = self.board.create_polygon((pos_i + triangle_size) * self.width + 4,
+                                                   (pos_j + 0.5 - triangle_size) * self.width + 4,
+                                                   (pos_i + triangle_size) * self.width + 4,
+                                                   (pos_j + 0.5 + triangle_size) * self.width + 4,
+                                                   pos_i * self.width + 4,
+                                                   (pos_j + 0.5) * self.width + 4,
+                                                   fill=color, width=1)
+        elif action == 3:
+            grid_arrow = self.board.create_polygon((pos_i + 1 - triangle_size) * self.width + 4,
+                                                   (pos_j + 0.5 - triangle_size) * self.width + 4,
+                                                   (pos_i + 1 - triangle_size) * self.width + 4,
+                                                   (pos_j + 0.5 + triangle_size) * self.width + 4,
+                                                   (pos_i + 1) * self.width + 4,
+                                                   (pos_j + 0.5) * self.width + 4,
+                                                   fill=color, width=1)
+        else:
+            raise ValueError("Unknown action %i" % action)
+
+        return grid_arrow
