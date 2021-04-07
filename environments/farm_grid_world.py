@@ -107,7 +107,8 @@ class FarmGridWorld(Environment):
 
         return expected_reward, states_next, probs
 
-    def state_to_nnet_input(self, state: FarmState) -> np.ndarray:
+    def states_to_nnet_input(self, state: List[FarmState]) -> np.ndarray:
+        # TODO do for list
         idx = state.agent_idx
 
         idx_oh = 10 * idx[0] + idx[1]

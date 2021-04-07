@@ -52,7 +52,7 @@ class Environment(ABC):
         pass
 
     @abstractmethod
-    def state_to_nnet_input(self, state: State) -> np.ndarray:
+    def states_to_nnet_input(self, state: List[State]) -> np.ndarray:
         """
 
         @return: state representation to nnet
