@@ -3,7 +3,7 @@ from environments.farm_grid_world import FarmGridWorld, FarmState
 from visualizer.farm_visualizer import InteractiveFarm, load_grid
 import time
 from argparse import ArgumentParser
-from coding_hw_answers.coding_hw1 import breadth_first_search, iterative_deepening_search, best_first_search
+from coding_hw.coding_hw1 import breadth_first_search, iterative_deepening_search, best_first_search
 
 
 def main():
