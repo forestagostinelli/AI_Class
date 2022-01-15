@@ -35,7 +35,7 @@ class FarmGridWorld(Environment):
 
         self.grid_shape: Tuple[int, int] = grid_shape
 
-    def get_actions(self) -> List[int]:
+    def get_actions(self, state: FarmState) -> List[int]:
         return list(range(4))
 
     def is_terminal(self, state: FarmState) -> bool:

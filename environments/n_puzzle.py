@@ -74,7 +74,7 @@ class NPuzzle(Environment):
 
         return states_nnet
 
-    def get_actions(self) -> List[int]:
+    def get_actions(self, state: NPuzzleState) -> List[int]:
         return list(range(4))
 
     def generate_states(self, num_states: int, backwards_range: Tuple[int, int]) -> List[NPuzzleState]:

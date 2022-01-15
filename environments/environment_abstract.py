@@ -15,9 +15,10 @@ class State(ABC):
 
 class Environment(ABC):
     @abstractmethod
-    def get_actions(self) -> List[int]:
-        """
+    def get_actions(self, state: State) -> List[int]:
+        """ Returns available actions in that state
 
+        @param state: state
         :return List[int]: actions
         """
         pass
