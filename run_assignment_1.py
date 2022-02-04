@@ -3,7 +3,7 @@ from environments.farm_grid_world import FarmGridWorld, FarmState
 from visualizer.farm_visualizer import InteractiveFarm, load_grid
 import time
 from argparse import ArgumentParser
-from coding_hw.coding_hw1 import breadth_first_search, iterative_deepening_search, best_first_search
+from coding_hw_answers.coding_hw1 import breadth_first_search, iterative_deepening_search, best_first_search
 
 
 def main():
@@ -19,9 +19,7 @@ def main():
     env: FarmGridWorld = FarmGridWorld(grid.shape, 0.0)
 
     viz: InteractiveFarm = InteractiveFarm(env, grid)
-
-    for _ in range(100):
-        viz.window.update()
+    viz.window.update()
 
     if args.method == "breadth_first":
         breadth_fs(env, viz)
@@ -35,19 +33,24 @@ def main():
     viz.mainloop()
 
 
-def show_soln(state: FarmState, viz: InteractiveFarm, actions: List[int]):
+def show_soln(state: FarmState, viz: InteractiveFarm, actions: List[int]) -> float:
+    path_cost: float = 0.0
     for action in actions:
-        state = viz.env.sample_transition(state, action)[0]
+        state, reward = viz.env.sample_transition(state, action)
+        path_cost += -reward
         viz.board.delete(viz.agent_img)
         viz.agent_img = viz.place_imgs(viz.board, viz.robot_pic, [state.agent_idx])[0]
 
         viz.window.update()
         time.sleep(0.1)
 
+    return path_cost
+
 
 def breadth_fs(env: FarmGridWorld, viz: InteractiveFarm):
     state: FarmState = FarmState(viz.start_idx, viz.goal_idx, viz.plant_idxs, viz.rocks_idxs)
     actions = breadth_first_search(state, env, viz)
+    print(f"Soln Depth: {len(actions)}")
 
     show_soln(state, viz, actions)
 
@@ -55,6 +58,7 @@ def breadth_fs(env: FarmGridWorld, viz: InteractiveFarm):
 def ids(env: FarmGridWorld, viz: InteractiveFarm):
     state: FarmState = FarmState(viz.start_idx, viz.goal_idx, viz.plant_idxs, viz.rocks_idxs)
     actions = iterative_deepening_search(state, env, viz)
+    print(f"Soln Depth: {len(actions)}")
 
     show_soln(state, viz, actions)
 
@@ -63,7 +67,8 @@ def best_fs(env: FarmGridWorld, viz: InteractiveFarm, weight_g, weight_h):
     state: FarmState = FarmState(viz.start_idx, viz.goal_idx, viz.plant_idxs, viz.rocks_idxs)
     actions = best_first_search(state, env, weight_g, weight_h, viz)
 
-    show_soln(state, viz, actions)
+    path_cost = show_soln(state, viz, actions)
+    print(f"Path Cost: {path_cost}")
 
 
 if __name__ == "__main__":
