@@ -59,3 +59,25 @@ class Environment(ABC):
         @return: state representation to nnet
         """
         pass
+
+
+class GameState(ABC):
+    pass
+
+
+class Game(ABC):
+    @abstractmethod
+    def get_actions(self, state: GameState):
+        pass
+
+    @abstractmethod
+    def is_terminal(self, state: GameState):
+        pass
+
+    @abstractmethod
+    def utility(self, state: GameState) -> float:
+        pass
+
+    @abstractmethod
+    def next_state(self, state: GameState, action: int) -> GameState:
+        pass

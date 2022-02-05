@@ -1,17 +1,73 @@
-from typing import List
+from typing import List, Optional
 import numpy as np
+from environments.environment_abstract import Game, GameState
 
 
-class ConnectFourState:
-    def __init__(self, grid: np.ndarray, turn: bool):
+class ConnectFourState(GameState):
+    def __init__(self, grid: np.ndarray, player_turn: int):
         self.grid: np.ndarray = grid
-        self.turn: bool = turn
+        self.player_turn: int = player_turn
+        self.utility: Optional[float] = None
+        self.lines: List[np.array] = []
+        self.is_terminal = self._is_terminal(player_turn * (-1))
 
-    def __eq__(self, other):
+    def get_lines(self) -> List[np.array]:
+        if len(self.lines) == 0:
+            lines: List[np.array] = []
+            grid = self.grid
+
+            # rows and columns
+            for pos_i in range(grid.shape[0]):
+                lines.append(grid[pos_i, :])
+
+            for pos_j in range(grid.shape[1]):
+                lines.append(grid[:, pos_j])
+
+            # diagonals
+            grid_rot90 = np.rot90(grid)
+            for offset in range(grid.shape[1]):
+                line1 = grid.diagonal(offset, axis1=0, axis2=1)
+                line2 = grid_rot90.diagonal(offset, axis1=1, axis2=0)
+                lines.extend([line1, line2])
+
+            for offset in range(1, grid.shape[0]):
+                line1 = grid.diagonal(offset, axis1=1, axis2=0)
+                line2 = grid_rot90.diagonal(offset, axis1=0, axis2=1)
+                lines.extend([line1, line2])
+
+            self.lines = lines
+
+        return self.lines
+
+    def _is_terminal(self, player: int) -> bool:
+        rows_cols_diags: List[np.array] = self.get_lines()
+        for line in rows_cols_diags:
+            if len(line) < 4:
+                continue
+
+            num_connected: int = 0
+            eq_player_line = line == player
+            for eq_player in eq_player_line:
+                if eq_player:
+                    num_connected += 1
+                else:
+                    num_connected = 0
+
+                if num_connected >= 4:
+                    self.utility = player * 1e6
+                    return True
+
+        if np.sum(self.grid == 0) == 0:
+            self.utility = 0
+            return True
+
+        return False
+
+
+class ConnectFour(Game):
+    def __init__(self):
         pass
 
-
-class ConnectFour:
     def get_actions(self, state: ConnectFourState) -> List[int]:
         actions: List[int] = []
         for action in range(state.grid.shape[0]):
@@ -24,120 +80,11 @@ class ConnectFour:
         if np.sum(state.grid == 0) == 0:
             return True
 
-        for player in [1, -1]:
-            # check horizontal
-            for pos_i in range(state.grid.shape[0]):
-                num_in_row: int = 0
-                for pos_j in range(state.grid.shape[1]):
-                    if state.grid[pos_i, pos_j] == player:
-                        num_in_row += 1
-                    else:
-                        num_in_row = 0
-
-                    if num_in_row == 4:
-                        return True
-
-            # check vertical
-            for pos_j in range(state.grid.shape[1]):
-                num_in_row: int = 0
-                for pos_i in range(state.grid.shape[0]):
-                    if state.grid[pos_i, pos_j] == player:
-                        num_in_row += 1
-                    else:
-                        num_in_row = 0
-
-                    if num_in_row == 4:
-                        return True
-
-            # check diagonal
-            for pos_i in range(state.grid.shape[0]):
-                for pos_j in range(state.grid.shape[1]):
-                    diag_incr: int = 0
-                    num_in_row: int = 0
-                    while (pos_i + diag_incr < state.grid.shape[0]) and (pos_j + diag_incr < state.grid.shape[1]):
-                        if state.grid[pos_i + diag_incr, pos_j + diag_incr] == player:
-                            num_in_row += 1
-                        else:
-                            num_in_row = 0
-
-                        if num_in_row == 4:
-                            return True
-
-                        diag_incr += 1
-
-                    diag_incr: int = 0
-                    num_in_row: int = 0
-                    while (pos_i + diag_incr < state.grid.shape[0]) and (pos_j - diag_incr >= 0):
-                        if state.grid[pos_i + diag_incr, pos_j - diag_incr] == player:
-                            num_in_row += 1
-                        else:
-                            num_in_row = 0
-
-                        if num_in_row == 4:
-                            return True
-
-                        diag_incr += 1
-
-        return False
+        return state.is_terminal
 
     def utility(self, state: ConnectFourState) -> float:
-        assert self.is_terminal(state), "State must be terminal to get utility"
-        if np.sum(state.grid == 0) == 0:
-            return 0
-
-        for player in [1, -1]:
-            # check horizontal
-            for pos_i in range(state.grid.shape[0]):
-                num_in_row: int = 0
-                for pos_j in range(state.grid.shape[1]):
-                    if state.grid[pos_i, pos_j] == player:
-                        num_in_row += 1
-                    else:
-                        num_in_row = 0
-
-                    if num_in_row == 4:
-                        return player * 1e6
-
-            # check vertical
-            for pos_j in range(state.grid.shape[1]):
-                num_in_row: int = 0
-                for pos_i in range(state.grid.shape[0]):
-                    if state.grid[pos_i, pos_j] == player:
-                        num_in_row += 1
-                    else:
-                        num_in_row = 0
-
-                    if num_in_row == 4:
-                        return player * 1e6
-
-            # check diagonal
-            for pos_i in range(state.grid.shape[0]):
-                for pos_j in range(state.grid.shape[1]):
-                    diag_incr: int = 0
-                    num_in_row: int = 0
-                    while (pos_i + diag_incr < state.grid.shape[0]) and (pos_j + diag_incr < state.grid.shape[1]):
-                        if state.grid[pos_i + diag_incr, pos_j + diag_incr] == player:
-                            num_in_row += 1
-                        else:
-                            num_in_row = 0
-
-                        if num_in_row == 4:
-                            return player * 1e6
-
-                        diag_incr += 1
-
-                    diag_incr: int = 0
-                    num_in_row: int = 0
-                    while (pos_i + diag_incr < state.grid.shape[0]) and (pos_j - diag_incr >= 0):
-                        if state.grid[pos_i + diag_incr, pos_j - diag_incr] == player:
-                            num_in_row += 1
-                        else:
-                            num_in_row = 0
-
-                        if num_in_row == 4:
-                            return player * 1e6
-
-                        diag_incr += 1
+        assert state.utility is not None, "State must be checked for terminal and be terminal to get utility"
+        return state.utility
 
     def next_state(self, state: ConnectFourState, action: int) -> ConnectFourState:
         assert action in self.get_actions(state), "Must be a legal move"
@@ -148,11 +95,8 @@ class ConnectFour:
             if grid_next[action, idx] == 0:
                 idx_add = idx
 
-        if state.turn:
-            grid_next[action, idx_add] = 1
-        else:
-            grid_next[action, idx_add] = -1
+        grid_next[action, idx_add] = state.player_turn
 
-        state_next = ConnectFourState(grid_next, not state.turn)
+        state_next = ConnectFourState(grid_next, state.player_turn * (-1))
 
         return state_next

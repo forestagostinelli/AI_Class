@@ -5,6 +5,7 @@ from tkinter import Canvas
 from tkinter import LEFT
 
 from environments.connect_four import ConnectFourState, ConnectFour
+import time
 
 
 class ConnectFourVisualizer:
@@ -14,7 +15,8 @@ class ConnectFourVisualizer:
         self.env: ConnectFour = env
         self.grid_dim_x = 7
         self.grid_dim_y = 6
-        self.state: ConnectFourState = ConnectFourState(np.zeros((self.grid_dim_x, self.grid_dim_y)), False)
+        grid_init = np.zeros((self.grid_dim_x, self.grid_dim_y))
+        self.state: ConnectFourState = ConnectFourState(grid_init, -1)
 
         super().__init__()
         # initialize board
@@ -39,7 +41,9 @@ class ConnectFourVisualizer:
                         elif self.env.utility(self.state) == 0:
                             print("DRAW!")
                     else:
+                        start_time = time.time()
                         action_clicked_opp = opponent(self.state)
+                        print("MAX Move Time: %s seconds" % (time.time() - start_time))
                         self.state = self.env.next_state(self.state, action_clicked_opp)
 
                         if self.env.is_terminal(self.state):
@@ -51,6 +55,8 @@ class ConnectFourVisualizer:
                                 print("DRAW!")
 
                     self._update()
+
+                print("---")
 
             return clicked_fn
 
@@ -74,6 +80,8 @@ class ConnectFourVisualizer:
         self.board.pack(side=LEFT)
 
         self.window.update()
+
+        self._update()
 
     def mainloop(self):
         self.window.mainloop()
