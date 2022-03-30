@@ -5,7 +5,7 @@ import numpy as np
 import pickle
 import time
 
-from coding_hw_answers.coding_hw4 import train_nnet
+from coding_hw.coding_hw4 import train_nnet
 
 
 def evaluate_nnet(nnet: nn.Module, data_input_np, data_labels_np):
