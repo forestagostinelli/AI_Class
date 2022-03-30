@@ -53,6 +53,14 @@ class Environment(ABC):
         pass
 
     @abstractmethod
+    def sample_start_states(self, num_states: int) -> List[State]:
+        """
+        @param num_states: number of states
+        @return: a list of start states
+        """
+        pass
+
+    @abstractmethod
     def states_to_nnet_input(self, state: List[State]) -> np.ndarray:
         """
 

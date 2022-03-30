@@ -1,3 +1,4 @@
+from typing import Optional
 from environments.environment_abstract import State, Environment
 from typing import List, Tuple
 import numpy as np
@@ -28,12 +29,16 @@ class FarmState(State):
 
 
 class FarmGridWorld(Environment):
-    def __init__(self, grid_shape: Tuple[int, int], rand_right: float):
+    def __init__(self, grid_shape: Tuple[int, int], rand_right: float, grid: Optional = None):
         super().__init__()
 
         self.rand_right_prob: float = rand_right
 
         self.grid_shape: Tuple[int, int] = grid_shape
+        if grid is not None:
+            self.goal_idx: Tuple[int, int] = mask_to_idxs(grid, 2)[0]
+            self.plant_idxs: List[Tuple[int, int]] = mask_to_idxs(grid, 3)
+            self.rocks_idxs: List[Tuple[int, int]] = mask_to_idxs(grid, 4)
 
     def get_actions(self, state: FarmState) -> List[int]:
         return list(range(4))
@@ -106,6 +111,17 @@ class FarmGridWorld(Environment):
         assert(np.sum(probs) == 1.0)
 
         return expected_reward, states_next, probs
+
+    def sample_start_states(self, num_states: int) -> List[FarmState]:
+        states: List[FarmState] = []
+        agent_idxs_0 = np.random.randint(0, self.grid_shape[0], size=num_states)
+        agent_idxs_1 = np.random.randint(0, self.grid_shape[1], size=num_states)
+        for i in range(num_states):
+            state = FarmState((agent_idxs_0[i], agent_idxs_1[i]), self.goal_idx, self.plant_idxs, self.rocks_idxs)
+
+            states.append(state)
+
+        return states
 
     def states_to_nnet_input(self, state: List[FarmState]) -> np.ndarray:
         # TODO do for list
