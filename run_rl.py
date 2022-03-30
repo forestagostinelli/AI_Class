@@ -5,7 +5,7 @@ from utils import env_utils
 from argparse import ArgumentParser
 from visualizer.farm_visualizer import InteractiveFarm
 
-from coding_hw_answers.coding_hw4 import policy_iteration, sarsa
+from coding_hw.coding_hw4 import policy_iteration, sarsa
 
 import pickle
 import numpy as np
