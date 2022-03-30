@@ -78,6 +78,6 @@ def sarsa(env: Environment, action_values: Dict[State, List[float]], epsilon: fl
     @param num_episodes: number of episodes for learning
     @param viz: optional visualizer
 
-    @return: the action value function found by Q-learning
+    @return: the learned action value function
     """
     pass
