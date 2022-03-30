@@ -45,7 +45,7 @@ def train_nnet(train_input_np: np.ndarray, train_labels_np: np.array, val_input_
     :param train_labels_np: training labels
     :param val_input_np: validation inputs
     :param val_labels_np: validation labels
-    :return: None
+    :return: the trained neural network
     """
     pass
 
@@ -80,3 +80,4 @@ def sarsa(env: Environment, action_values: Dict[State, List[float]], epsilon: fl
 
     @return: the action value function found by Q-learning
     """
+    pass
