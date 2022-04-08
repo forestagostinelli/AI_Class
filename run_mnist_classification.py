@@ -14,7 +14,7 @@ def evaluate_nnet(nnet: nn.Module, data_input_np, data_labels_np):
 
     val_input = torch.tensor(data_input_np).float()
     val_labels = torch.tensor(data_labels_np).long()
-    nnet_output: Tensor = nnet(val_input)
+    nnet_output: Tensor = nnet(val_input).detach()
 
     loss = criterion(nnet_output, val_labels)
 
