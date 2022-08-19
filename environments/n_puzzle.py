@@ -36,12 +36,18 @@ class NPuzzle(Environment):
             self.dtype = np.int
 
         # Solved state
-        self.goal_tiles: np.ndarray = np.concatenate((np.arange(1, self.dim * self.dim), [0])).astype(self.dtype)
+        self.goal_tiles: np.ndarray = np.arange(0, self.dim * self.dim).astype(self.dtype)
 
         # Next state ops
         self.swap_zero_idxs: np.ndarray = self._get_swap_zero_idxs(self.dim)
 
         self.one_hot_convert = np.eye(self.dim ** 2).astype(np.uint8)
+
+        self.num_moves: int = 4
+
+    @property
+    def env_name(self) -> str:
+        return f"puzzle{(self.dim ** 2) -1}"
 
     def sample_transition(self, state: NPuzzleState, action: int) -> Tuple[NPuzzleState, float]:
         # initialize
@@ -77,13 +83,22 @@ class NPuzzle(Environment):
     def get_actions(self, state: NPuzzleState) -> List[int]:
         return list(range(4))
 
+    def state_action_dynamics(self, state: NPuzzleState, action: int) -> Tuple[float, List[NPuzzleState], List[float]]:
+        expected_reward: float = -1.0
+        states_next: List[NPuzzleState] = [self.sample_transition(state, action)[0]]
+        probs: List[float] = [1.0]
+
+        return expected_reward, states_next, probs
+
+    def sample_start_states(self, num_states: int) -> List[NPuzzleState]:
+        return self.generate_states(num_states, (500, 500))
+
     def generate_states(self, num_states: int, backwards_range: Tuple[int, int]) -> List[NPuzzleState]:
         assert (num_states > 0)
         assert (backwards_range[0] >= 0)
 
         # Initialize
         scrambs: List[int] = list(range(backwards_range[0], backwards_range[1] + 1))
-        num_env_moves: int = len(self.get_actions())
 
         # Get goal states
         states_np: np.ndarray = self._generate_goal_states(num_states, np_format=True)
@@ -99,10 +114,10 @@ class NPuzzle(Environment):
         # Go backward from goal state
         while np.max(num_back_moves < scramble_nums):
             idxs: np.ndarray = np.where((num_back_moves < scramble_nums))[0]
-            subset_size: int = int(max(len(idxs) / num_env_moves, 1))
+            subset_size: int = int(max(len(idxs) / self.num_moves, 1))
             idxs: np.ndarray = np.random.choice(idxs, subset_size)
 
-            move: int = randrange(num_env_moves)
+            move: int = randrange(self.num_moves)
             states_np[idxs], z_idxs[idxs], _ = self._move_np(states_np[idxs], z_idxs[idxs], move)
 
             num_back_moves[idxs] = num_back_moves[idxs] + 1
@@ -110,13 +125,6 @@ class NPuzzle(Environment):
         states: List[NPuzzleState] = [NPuzzleState(x) for x in list(states_np)]
 
         return states
-
-    def state_action_dynamics(self, state: NPuzzleState, action: int) -> Tuple[float, List[NPuzzleState], List[float]]:
-        expected_reward: float = -1.0
-        states_next: List[NPuzzleState] = [self.sample_transition(state, action)[0]]
-        probs: List[float] = [1.0]
-
-        return expected_reward, states_next, probs
 
     def _get_swap_zero_idxs(self, n: int) -> np.ndarray:
         swap_zero_idxs: np.ndarray = np.zeros((n ** 2, len(NPuzzle.moves)), dtype=self.dtype)

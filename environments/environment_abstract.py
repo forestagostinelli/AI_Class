@@ -14,6 +14,11 @@ class State(ABC):
 
 
 class Environment(ABC):
+    @property
+    @abstractmethod
+    def env_name(self) -> str:
+        pass
+
     @abstractmethod
     def get_actions(self, state: State) -> List[int]:
         """ Returns available actions in that state

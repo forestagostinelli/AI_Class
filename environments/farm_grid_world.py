@@ -40,6 +40,10 @@ class FarmGridWorld(Environment):
             self.plant_idxs: List[Tuple[int, int]] = mask_to_idxs(grid, 3)
             self.rocks_idxs: List[Tuple[int, int]] = mask_to_idxs(grid, 4)
 
+    @property
+    def env_name(self) -> str:
+        return "aifarm"
+
     def get_actions(self, state: FarmState) -> List[int]:
         return list(range(4))
 

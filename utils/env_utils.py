@@ -1,7 +1,6 @@
-from typing import List
+from typing import List, Optional
 import re
-import pickle
-from environments.environment_abstract import Environment
+from environments.environment_abstract import Environment, State
 import numpy as np
 
 
@@ -9,6 +8,7 @@ def get_environment(env_name: str):
     env_name = env_name.lower()
     farm_regex = re.search("aifarm(_(\S+))?", env_name)
     env: Environment
+    states: Optional[List[State]]
 
     if farm_regex is not None:
         from environments.farm_grid_world import FarmGridWorld, FarmState
@@ -24,7 +24,7 @@ def get_environment(env_name: str):
         viz = InteractiveFarm(env, grid)
 
         # get states
-        states: List[FarmState] = []
+        states = []
 
         for pos_i in range(grid.shape[0]):
             for pos_j in range(grid.shape[1]):
@@ -34,7 +34,8 @@ def get_environment(env_name: str):
         from environments.n_puzzle import NPuzzle
         env = NPuzzle(3)
 
-        states = pickle.load(open("data/puzzle8.pkl", "rb"))['states']
+        states = None
+        # states = pickle.load(open("data/puzzle8_data.pkl", "rb"))['states']
 
         viz = None
     else:
