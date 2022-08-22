@@ -48,10 +48,10 @@ def main():
         raise ValueError("Unknown search method %s" % args.method)
     print(f"Total time: {time.time() - start_time}")
 
+    state: State = state_start
     if actions is not None:
         # Get results
         path_cost: float = 0.0
-        state: State = state_start
         for action in actions:
             state, reward = env.sample_transition(state, action)
             path_cost += -reward
@@ -61,7 +61,14 @@ def main():
 
         if viz is not None:
             show_soln(state_start, viz, actions)
-            viz.mainloop()
+
+    if env.is_terminal(state):
+        print("SOLVED")
+    else:
+        print("NOT SOLVED")
+
+    if viz is not None:
+        viz.mainloop()
 
 
 def show_soln(state_start: FarmState, viz: InteractiveFarm, actions: List[int]):
