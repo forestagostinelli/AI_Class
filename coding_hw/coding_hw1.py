@@ -1,8 +1,10 @@
 from typing import List, Tuple, Set, Dict, Optional, cast
 from environments.environment_abstract import Environment, State
 from environments.farm_grid_world import FarmState
+from environments.n_puzzle import NPuzzleState
 from heapq import heappush, heappop
 import time
+import numpy as np
 
 
 class Node:
@@ -32,6 +34,9 @@ def get_next_state_and_transition_cost(env: Environment, state: State, action: i
 
 
 def visualize_bfs(viz, closed_set: Set[State], queue: List[Node], wait: float):
+    if viz is None:
+        return
+
     grid_dim_x, grid_dim_y = viz.env.grid_shape
     for pos_i in range(grid_dim_x):
         for pos_j in range(grid_dim_y):
@@ -51,6 +56,9 @@ def visualize_bfs(viz, closed_set: Set[State], queue: List[Node], wait: float):
 
 
 def visualize_dfs(viz, popped_node: Node, lifo: List[Node]):
+    if viz is None:
+        return
+
     grid_dim_x, grid_dim_y = viz.env.grid_shape
     for pos_i in range(grid_dim_x):
         for pos_j in range(grid_dim_y):
