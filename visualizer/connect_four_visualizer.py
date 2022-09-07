@@ -9,7 +9,7 @@ import time
 
 
 class ConnectFourVisualizer:
-    def __init__(self, env: ConnectFour, opponent: Callable):
+    def __init__(self, env: ConnectFour, ai_agent: Callable):
         # 0: up, 1: down, 2: left, 3: right
 
         self.env: ConnectFour = env
@@ -42,9 +42,9 @@ class ConnectFourVisualizer:
                             print("DRAW!")
                     else:
                         start_time = time.time()
-                        action_clicked_opp = opponent(self.state)
+                        action_clicked_ai = ai_agent(self.state)
                         print("MAX Move Time: %s seconds" % (time.time() - start_time))
-                        self.state = self.env.next_state(self.state, action_clicked_opp)
+                        self.state = self.env.next_state(self.state, action_clicked_ai)
 
                         if self.env.is_terminal(self.state):
                             if self.env.utility(self.state) > 0:
