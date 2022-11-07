@@ -1,4 +1,4 @@
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional, Tuple, Callable
 from environments.environment_abstract import Environment, State
 from environments.farm_grid_world import FarmGridWorld
 from visualizer.farm_visualizer import InteractiveFarm
@@ -46,6 +46,29 @@ def train_nnet(train_input_np: np.ndarray, train_labels_np: np.array, val_input_
     :param val_input_np: validation inputs
     :param val_labels_np: validation labels
     :return: the trained neural network
+    """
+    pass
+
+
+def train_nnet_np(train_input_np: np.ndarray, train_labels_np: np.array, val_input_np: np.ndarray,
+                  val_labels_np: np.array) -> Callable:
+    """
+
+    :param train_input_np: training inputs
+    :param train_labels_np: training labels
+    :param val_input_np: validation inputs
+    :param val_labels_np: validation labels
+    :return: the trained neural network
+    """
+    pass
+
+
+def evaluate_nnet_np(nnet: Callable, data_input_np: np.ndarray, data_labels_np: np.array) -> Tuple[float, float]:
+    """
+    :param nnet: the trained neural network
+    :param data_input_np: validation inputs
+    :param data_labels_np: validation labels
+    :return: the loss and the accuracy
     """
     pass
 

@@ -1,11 +1,13 @@
+from typing import Callable
 import torch
 import torch.nn as nn
 from torch import Tensor
 import numpy as np
 import pickle
 import time
+from argparse import ArgumentParser
 
-from coding_hw.coding_hw4 import train_nnet
+from coding_hw.coding_hw4 import train_nnet, train_nnet_np, evaluate_nnet_np
 
 
 def evaluate_nnet(nnet: nn.Module, data_input_np, data_labels_np):
@@ -25,6 +27,10 @@ def evaluate_nnet(nnet: nn.Module, data_input_np, data_labels_np):
 
 
 def main():
+    parser: ArgumentParser = ArgumentParser()
+    parser.add_argument('--extra', default=False, action='store_true', help="")
+    args = parser.parse_args()
+
     # parse data
     train_input_np, train_labels_np = pickle.load(open("data/mnist/mnist_train.pkl", "rb"))
     train_input_np = train_input_np.reshape(-1, 28 * 28)
@@ -36,9 +42,12 @@ def main():
 
     # get nnet
     start_time = time.time()
-    nnet: nn.Module = train_nnet(train_input_np, train_labels_np, val_input_np, val_labels_np)
-
-    loss, acc = evaluate_nnet(nnet, val_input_np, val_labels_np)
+    if not args.extra:
+        nnet: nn.Module = train_nnet(train_input_np, train_labels_np, val_input_np, val_labels_np)
+        loss, acc = evaluate_nnet(nnet, val_input_np, val_labels_np)
+    else:
+        nnet: Callable = train_nnet_np(train_input_np, train_labels_np, val_input_np, val_labels_np)
+        loss, acc = evaluate_nnet_np(nnet, val_input_np, val_labels_np)
     print(f"Loss: %.5f, Accuracy: %.2f%%, Time: %.2f seconds" % (loss, acc, time.time() - start_time))
 
 
