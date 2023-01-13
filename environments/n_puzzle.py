@@ -10,16 +10,55 @@ class NPuzzleState(State):
 
     def __init__(self, tiles: np.ndarray):
         self.tiles: np.ndarray = tiles
-        self.hash = None
 
     def __hash__(self):
-        if self.hash is None:
-            self.hash = hash(self.tiles.tostring())
-
-        return self.hash
+        return hash(self.tiles.tostring())
 
     def __eq__(self, other):
-        return np.array_equal(self.tiles, other.tiles)
+        return np.all(self.tiles == other.tiles)
+
+
+def _get_swap_zero_idxs(n: int) -> np.ndarray:
+    swap_zero_idxs: np.ndarray = np.zeros((n ** 2, len(NPuzzle.moves)), dtype=int)
+    for moveIdx, move in enumerate(NPuzzle.moves):
+        for i in range(n):
+            for j in range(n):
+                z_idx = np.ravel_multi_index((i, j), (n, n))
+
+                state = np.ones((n, n), dtype=int)
+                state[i, j] = 0
+
+                is_eligible: bool = False
+                if move == 'U':
+                    is_eligible = i < (n - 1)
+                elif move == 'D':
+                    is_eligible = i > 0
+                elif move == 'L':
+                    is_eligible = j < (n - 1)
+                elif move == 'R':
+                    is_eligible = j > 0
+
+                if is_eligible:
+                    swap_i: int = -1
+                    swap_j: int = -1
+                    if move == 'U':
+                        swap_i = i + 1
+                        swap_j = j
+                    elif move == 'D':
+                        swap_i = i - 1
+                        swap_j = j
+                    elif move == 'L':
+                        swap_i = i
+                        swap_j = j + 1
+                    elif move == 'R':
+                        swap_i = i
+                        swap_j = j - 1
+
+                    swap_zero_idxs[z_idx, moveIdx] = np.ravel_multi_index((swap_i, swap_j), (n, n))
+                else:
+                    swap_zero_idxs[z_idx, moveIdx] = z_idx
+
+    return swap_zero_idxs
 
 
 class NPuzzle(Environment):
@@ -30,18 +69,14 @@ class NPuzzle(Environment):
         super().__init__()
 
         self.dim: int = dim
-        if self.dim <= 15:
-            self.dtype = np.uint8
-        else:
-            self.dtype = np.int
 
         # Solved state
-        self.goal_tiles: np.ndarray = np.arange(0, self.dim * self.dim).astype(self.dtype)
+        self.goal_tiles: np.ndarray = np.arange(0, self.dim * self.dim).astype(int)
 
         # Next state ops
-        self.swap_zero_idxs: np.ndarray = self._get_swap_zero_idxs(self.dim)
+        self.swap_zero_idxs: np.ndarray = _get_swap_zero_idxs(self.dim)
 
-        self.one_hot_convert = np.eye(self.dim ** 2).astype(np.uint8)
+        self.one_hot_convert = np.eye(self.dim ** 2).astype(int)
 
         self.num_moves: int = 4
 
@@ -52,11 +87,10 @@ class NPuzzle(Environment):
     def sample_transition(self, state: NPuzzleState, action: int) -> Tuple[NPuzzleState, float]:
         # initialize
         state_np = np.stack([x.tiles for x in [state]], axis=0)
-        states_next_np: np.ndarray = state_np.copy()
 
         # get zero indicies
         z_idxs: np.ndarray
-        _, z_idxs = np.where(states_next_np == 0)
+        _, z_idxs = np.where(state_np == 0)
 
         # get next state
         states_next_np, _, transition_costs = self._move_np(state_np, z_idxs, action)
@@ -67,10 +101,7 @@ class NPuzzle(Environment):
         return state_next, -1.0
 
     def is_terminal(self, state: NPuzzleState) -> bool:
-        states_np = np.stack([state.tiles for state in [state]], axis=0)
-        is_equal = np.equal(states_np, np.expand_dims(self.goal_tiles, 0))
-
-        return np.all(is_equal, axis=1)[0]
+        return np.all(state.tiles == self.goal_tiles)
 
     def states_to_nnet_input(self, states: List[NPuzzleState]) -> np.ndarray:
         states_np = np.stack([x.tiles for x in states], axis=0)
@@ -125,48 +156,6 @@ class NPuzzle(Environment):
         states: List[NPuzzleState] = [NPuzzleState(x) for x in list(states_np)]
 
         return states
-
-    def _get_swap_zero_idxs(self, n: int) -> np.ndarray:
-        swap_zero_idxs: np.ndarray = np.zeros((n ** 2, len(NPuzzle.moves)), dtype=self.dtype)
-        for moveIdx, move in enumerate(NPuzzle.moves):
-            for i in range(n):
-                for j in range(n):
-                    z_idx = np.ravel_multi_index((i, j), (n, n))
-
-                    state = np.ones((n, n), dtype=np.int)
-                    state[i, j] = 0
-
-                    is_eligible: bool = False
-                    if move == 'U':
-                        is_eligible = i < (n - 1)
-                    elif move == 'D':
-                        is_eligible = i > 0
-                    elif move == 'L':
-                        is_eligible = j < (n - 1)
-                    elif move == 'R':
-                        is_eligible = j > 0
-
-                    if is_eligible:
-                        swap_i: int = -1
-                        swap_j: int = -1
-                        if move == 'U':
-                            swap_i = i + 1
-                            swap_j = j
-                        elif move == 'D':
-                            swap_i = i - 1
-                            swap_j = j
-                        elif move == 'L':
-                            swap_i = i
-                            swap_j = j + 1
-                        elif move == 'R':
-                            swap_i = i
-                            swap_j = j - 1
-
-                        swap_zero_idxs[z_idx, moveIdx] = np.ravel_multi_index((swap_i, swap_j), (n, n))
-                    else:
-                        swap_zero_idxs[z_idx, moveIdx] = z_idx
-
-        return swap_zero_idxs
 
     def _move_np(self, states_np: np.ndarray, z_idxs: np.array,
                  action: int) -> Tuple[np.ndarray, np.array, List[float]]:
