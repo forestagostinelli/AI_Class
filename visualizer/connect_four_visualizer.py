@@ -1,4 +1,4 @@
-from typing import List, Callable
+from typing import List, Callable, Optional
 import numpy as np
 import tkinter
 from tkinter import Canvas
@@ -9,7 +9,7 @@ import time
 
 
 class ConnectFourVisualizer:
-    def __init__(self, env: ConnectFour, ai_agent: Callable):
+    def __init__(self, env: ConnectFour, ai_agent: Optional[Callable]):
         # 0: up, 1: down, 2: left, 3: right
 
         self.env: ConnectFour = env
@@ -86,6 +86,10 @@ class ConnectFourVisualizer:
     def mainloop(self):
         self.window.mainloop()
 
+    def update_state(self, state: ConnectFourState):
+        self.state = state
+        self._update()
+
     def _update(self):
         for pos_i in range(self.grid_dim_x):
             for pos_j in range(self.grid_dim_y):
@@ -93,6 +97,8 @@ class ConnectFourVisualizer:
                     self.board.itemconfigure(self.grid[pos_i][pos_j], fill="yellow")
                 elif self.state.grid[pos_i, pos_j] == -1:
                     self.board.itemconfigure(self.grid[pos_i][pos_j], fill="red")
+                elif self.state.grid[pos_i, pos_j] == 0:
+                    self.board.itemconfigure(self.grid[pos_i][pos_j], fill="white")
 
         self.window.update()
 
