@@ -4,7 +4,7 @@ from environments.connect_four import ConnectFourState, ConnectFour
 from visualizer.connect_four_visualizer import ConnectFourVisualizer
 import numpy as np
 
-from coding_hw_answers.coding_hw2 import make_move
+from coding_hw.coding_hw2 import make_move
 
 
 def main():
