@@ -5,7 +5,7 @@ from visualizer.farm_visualizer import InteractiveFarm, load_grid
 from utils import env_utils
 import time
 from argparse import ArgumentParser
-from coding_hw.coding_hw1 import search_optimal, search_speed
+from coding_hw_grade.chisolmi import search_optimal, search_speed
 import numpy as np
 import pickle
 
@@ -50,6 +50,7 @@ def main():
     parser.add_argument('--env', type=str, default="puzzle8", help="")
     parser.add_argument('--map', type=str, default="maps/map1.txt", help="")
     parser.add_argument('--type', type=str, required=True, help="")
+    parser.add_argument('--grade', action='store_true', default=False, help="")
 
     args = parser.parse_args()
 
@@ -91,9 +92,10 @@ def main():
             optimal_diffs.append(path_cost - path_cost_gt)
             is_optimal_l.append(path_cost == path_cost_gt)
 
-            print(f"State: {state_idx + 1}/{len(states_start)}, Path cost: {path_cost}, "
-                  f"Optimal path cost: {path_cost_gt}, Solved: {is_solved}, "
-                  f"Time state/total: %.5f secs / %.5f secs" % (time_elapsed, time_elapsed_tot))
+            if not args.grade:
+                print(f"State: {state_idx + 1}/{len(states_start)}, Path cost: {path_cost}, "
+                      f"Optimal path cost: {path_cost_gt}, Solved: {is_solved}, "
+                      f"Time state/total: %.5f secs / %.5f secs" % (time_elapsed, time_elapsed_tot))
 
         time_elapsed_tot = time.time() - start_time_tot
         print(f"Average difference with optimal path cost: {np.mean(optimal_diffs)}, "
