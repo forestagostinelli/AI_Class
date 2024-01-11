@@ -5,7 +5,7 @@ from visualizer.farm_visualizer import InteractiveFarm, load_grid
 from utils import env_utils
 import time
 from argparse import ArgumentParser
-from coding_hw_grade.chisolmi import search_optimal, search_speed
+from coding_hw.coding_hw1 import search_optimal, search_speed
 import numpy as np
 import pickle
 
