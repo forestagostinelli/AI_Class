@@ -18,7 +18,7 @@ class Node:
         return self.state.__hash__()
 
     def __gt__(self, other):
-        return self.path_cost < other.path_cost
+        return self.path_cost > other.path_cost
 
     def __eq__(self, other):
         return self.state == other.state
